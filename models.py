@@ -147,7 +147,7 @@ class CardioPulmonaryModel(eqx.Module):
             
             return derivatives
 
-        outputs = pressures
+        outputs = pressures | flow
         
         return derivatives, outputs  
     

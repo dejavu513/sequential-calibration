@@ -266,6 +266,172 @@ def modelSimpleLungParameters(atmosphericPressure):
 
     return modelComponentsResp
 
+# Contains the parameters and structure of the 3 level simple lung model
+def modelSimpleLungParametersCustom(atmosphericPressure, ParamArray):
+    
+    lungParams = {
+        
+        #################### Trachea
+        'C_Lu|0': 2.4,
+        'C_y0_Lu|0': 28,
+
+        'TypeR_Lu|0': 3,
+        'R_Lu|0': 0.001,
+        'L_Lu|0': 0.0001,
+        'L_y0_Lu|0': 0,
+
+        #################### Bronchia
+        'C_Lu|0|0': 3,
+        'C_y0_Lu|0|0': 36,
+
+        'TypeR_Lu|0|0': 1,
+        'R_Lu|0|0': 0.002,
+        'L_Lu|0|0': 0.0001,
+        'L_y0_Lu|0|0': 0,
+
+        #################### Alveoli
+        'C_Lu|0|0|0': 100,
+        'C_y0_Lu|0|0|0': 1400,
+
+        'TypeR_Lu|0|0|0': 1,
+        'R_Lu|0|0|0': 0.003,
+        'L_Lu|0|0|0': 0.0001,
+        'L_y0_Lu|0|0|0': 0,
+    }
+
+    lungParams['R_Lu|0'] = ParamArray[0]
+    lungParams['R_Lu|0|0'] = ParamArray[1]
+    lungParams['R_Lu|0|0|0'] = ParamArray[2]
+    lungParams['C_Lu|0'] = ParamArray[3]
+    lungParams['C_Lu|0|0'] = ParamArray[4]
+    lungParams['C_Lu|0|0|0'] = ParamArray[5]
+
+
+    capacitorsResp = {
+        'Lu|0': {
+            'id': 'C_Lu|0',
+            'pressure': 'V_Lu|0',
+            'typeC': 1,
+            'typeC_params': {
+                'C': lungParams['C_Lu|0'],
+                'biasPressure': atmosphericPressure,
+            },
+            'y0': lungParams['C_y0_Lu|0'],
+        },
+        'Lu|0|0': {
+            'id': 'C_Lu|0|0',
+            'pressure': 'V_Lu|0|0',
+            'typeC': 1,
+            'typeC_params': {
+                'C': lungParams['C_Lu|0|0'],
+                'biasPressure': atmosphericPressure,
+            },
+            'y0': lungParams['C_y0_Lu|0|0'],
+        },
+        'Lu|0|0|0': {
+            'id': 'C_Lu|0|0|0',
+            'pressure': 'V_Lu|0|0|0',
+            'typeC': 1,
+            'typeC_params': {
+                'C': lungParams['C_Lu|0|0|0'],
+                'biasPressure': atmosphericPressure,
+            },
+            'y0': lungParams['C_y0_Lu|0|0|0'],
+        },
+    }
+
+    resistorsResp = {
+        'Lu|0': {
+            'id': 'R_Lu|0',
+            'current': 'I_Lu|0',
+            'pressureIn': 'u',
+            'pressureOut': 'V_Lu|0',
+            'typeR': lungParams['TypeR_Lu|0'],
+            'typeR_params': {
+                'R': lungParams['R_Lu|0'],
+                'L': lungParams['L_Lu|0'],
+                'y0': lungParams['L_y0_Lu|0'],
+            },
+        },
+        'Lu|0|0': {
+            'id': 'R_Lu|0|0',
+            'current': 'I_Lu|0|0',
+            'pressureIn': 'V_Lu|0',
+            'pressureOut': 'V_Lu|0|0',
+            'typeR': lungParams['TypeR_Lu|0|0'],
+            'typeR': 1,
+            'typeR_params': {
+                'R': lungParams['R_Lu|0|0'],
+                'L': lungParams['L_Lu|0|0'],
+                'y0': lungParams['L_y0_Lu|0|0'],
+            },
+        },
+        'Lu|0|0|0': {
+            'id': 'R_Lu|0|0|0',
+            'current': 'I_Lu|0|0|0',
+            'pressureIn': 'V_Lu|0|0',
+            'pressureOut': 'V_Lu|0|0|0',
+            'typeR': lungParams['TypeR_Lu|0|0|0'],
+            'typeR': 1,
+            'typeR_params': {
+                'R': lungParams['R_Lu|0|0|0'],
+                'L': lungParams['L_Lu|0|0|0'],
+                'y0': lungParams['L_y0_Lu|0|0|0'],
+            },
+        },
+    }
+
+    modelComponentsResp = [
+        {
+            'id': 'Lu|0',
+            'level': 0,
+            'isLeaf': False,
+            'currentsIn': ['I_Lu|0'],
+            'currentsOut': ['I_Lu|0|0'],
+            'pressure': 'V_Lu|0',
+            'capacitor': capacitorsResp['Lu|0'],
+            'resistorsIn': [resistorsResp['Lu|0']],
+            'resistorsOut': [resistorsResp['Lu|0|0']],
+            'parent': '',
+            'children': ['Lu|0|0'],
+            'partialPressures': [],
+            'partialPressuresY0': [],
+        },
+        {
+            'id': 'Lu|0|0',
+            'level': 1,
+            'isLeaf': False,
+            'currentsIn': ['I_Lu|0|0'],
+            'currentsOut': ['I_Lu|0|0|0'],
+            'pressure': 'V_Lu|0|0',
+            'capacitor': capacitorsResp['Lu|0|0'],
+            'resistorsIn': [resistorsResp['Lu|0|0']],
+            'resistorsOut': [resistorsResp['Lu|0|0|0']],
+            'parent': 'Lu|0',
+            'children': ['Lu|0|0|0'],
+            'partialPressures': [],
+            'partialPressuresY0': [],
+        },
+        {
+            'id': 'Lu|0|0|0',
+            'level': 2,
+            'isLeaf': True,
+            'currentsIn': ['I_Lu|0|0|0'],
+            'currentsOut': [],
+            'pressure': 'V_Lu|0|0|0',
+            'capacitor': capacitorsResp['Lu|0|0|0'],
+            'resistorsIn': [resistorsResp['Lu|0|0|0']],
+            'resistorsOut': [],
+            'parent': 'Lu|0|0',
+            'children': [],
+            'partialPressures': [],
+            'partialPressuresY0': [],
+        },
+    ]
+
+    return modelComponentsResp
+
+
 # Contains the parameters and structure of the 6 level simple cardiovascular model
 def modelSimpleHeartParameters(totalVolume:float, atmosphericPressure:float):
     # Contains the distribution of the volumes of the different parts of the model

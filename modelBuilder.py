@@ -57,7 +57,7 @@ class ModelStructure:
     ██ ██   ████ ██    ██    ██ ██   ██ ███████ ██ ███████ ██   ██    ██    ██  ██████  ██   ████ 
     '''
 
-    def __init__(self,lung, heart, gasExchange, nrLevels) -> None:
+    def __init__(self,lung, heart, gasExchange, nrLevels, ParamArray) -> None:
         ############################################ Simulation Params
         self.hasLung = lung
         self.hasHeart = heart
@@ -76,7 +76,7 @@ class ModelStructure:
         self.ventilatorParams = Parameters.modelVentilatorParameters()
 
         ############################################ Base Model Compartemnts
-        self.baseLungCompartments = Parameters.modelSimpleLungParameters(self.atmosphericPressure)
+        self.baseLungCompartments = Parameters.modelSimpleLungParametersCustom(self.atmosphericPressure,ParamArray)
         self.baseHeartCompartments = Parameters.modelSimpleHeartParameters(self.totalBloodVolume, self.atmosphericPressure)
 
         ############################################ Tree Model Compartemnts
@@ -95,6 +95,8 @@ class ModelStructure:
                 self.init_Tree_Lung()
             if self.hasHeart:
                 self.init_Tree_Heart()
+
+
 
 
     '''
